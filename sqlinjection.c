@@ -31,6 +31,9 @@ int main(){
 
     while(1){
 
+
+#ifdef DESIGNER /*This is used for designer when doing any operations*/
+
         char input[1024] = "0";
 
         //User interface tips
@@ -42,16 +45,12 @@ int main(){
             printf("Error reading input.\n");
         }
 
-
-            /* Send SQL query */
-            /*SHOW TABLES*/
+        /* Send SQL query */
         if (mysql_query(conn, input)) {
             fprintf(stderr, "%s\n", mysql_error(conn));
             continue;
         }
 
-
-#ifdef DESIGNER /*This is used for designer when doing any operations*/
         // Check whether this query will return nothing
         if (mysql_field_count(conn) == 0) {
             // Query does not return data (e.g., INSERT, UPDATE, DELETE)
