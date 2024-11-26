@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define DESIGNER
+
 int main(){
 
     /*setting up connection to mysql*/
@@ -32,9 +34,9 @@ int main(){
         char input[1024] = "0";
 
         //User interface tips
-        fprintf(stdout,"\n\tplease enter database instructions: \t\n");
+        fprintf(stdout,"\nplease enter database instructions: \t");
         if (fgets(input, sizeof(input), stdin) != NULL) {
-            printf("input string: %s\n", input);
+            // printf("input string: %s\n", input);
         }
         else{
             printf("Error reading input.\n");
@@ -42,18 +44,41 @@ int main(){
 
 
             /* Send SQL query */
-        if (mysql_query(conn, "SHOW TABLES")) {
+            /*SHOW TABLES*/
+        if (mysql_query(conn, input)) {
             fprintf(stderr, "%s\n", mysql_error(conn));
-            exit(1);
+            continue;
         }
 
-        res = mysql_store_result(conn);
 
-        /* Output table names */
-        printf("Tables in MySQL database:\n");
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            printf("%s\n", row[0]);
+#ifdef DESIGNER /*This is used for designer when doing any operations*/
+        // Check whether this query will return nothing
+        if (mysql_field_count(conn) == 0) {
+            // Query does not return data (e.g., INSERT, UPDATE, DELETE)
+            int affected_rows = mysql_affected_rows(conn);
+            printf("Query OK, %d rows affected\n", affected_rows);
+        } else {
+            // Query returns data (e.g., SELECT)
+            res = mysql_store_result(conn);
+            if (res == NULL) {
+                fprintf(stderr, "%s\n", mysql_error(conn));
+                continue;
+            }
+
+            // Get the number of fields in the result
+            int num_fields = mysql_num_fields(res);
+
+            /* Output table names */
+            printf("\nquery output:\n\n\t");
+            while ((row = mysql_fetch_row(res)) != NULL) {
+                for (int i = 0; i < num_fields; i++) {
+                    printf("%s ", row[i] ? row[i] : "NULL");
+                }
+                printf("\n\t");
+            }
         }
+#endif
+
 
     }
 

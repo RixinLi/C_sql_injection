@@ -4,7 +4,8 @@ LIBS = -L/usr/lib/x86_64-linux-gnu -lmysqlclient -lpthread -ldl -lssl -lcrypto -
 
 TARGET =  sqlinjection
 
-
+DESIGNER: sqlinjection.o
+	$(CC) -o $(TARGET) sqlinjection.o $(LIBS) -DESIGNER
 sqlinjection: sqlinjection.o
 	$(CC) -o $(TARGET) sqlinjection.o $(LIBS)
 
