@@ -3,8 +3,9 @@
 #include <mysql/mysql.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
-#define DESIGNER
 
 int main(){
 
@@ -78,6 +79,84 @@ int main(){
         }
 #endif
 
+#ifdef LOGIN /*This is a scenario of LOGIN sql injection*/
+
+        char user_account[1024] = "0";
+        char user_password[1024] = "0";
+
+        //User interface for login:
+        fprintf(stdout,"\nplease enter user account: \t");
+        if (fgets(user_account, sizeof(user_account), stdin) != NULL) {
+            // printf("input string: %s\n", input);
+        }
+        else{
+            printf("Error reading input.\n");
+        }
+
+        fprintf(stdout,"\nplease enter user password: \t");
+        if (fgets(user_password, sizeof(user_password), stdin) != NULL) {
+            // printf("input string: %s\n", input);
+        }
+        else{
+            printf("Error reading input.\n");
+        }
+
+        // remove the '\n' after input 
+        strtok(user_account, "\n");
+        strtok(user_password, "\n");
+
+        // SELECT * FROM users WHERE username = 'your_username' AND password = 'your_password';
+        char operation[1024] = "SELECT * FROM users WHERE username = '";
+        strcat(operation,user_account);
+        strcat(operation,"' AND password = '");
+        strcat(operation,user_password);
+        strcat(operation,"';");
+
+        printf("%s\n",operation);
+
+        /* Send SQL query */
+        if (mysql_query(conn, operation)) {
+            fprintf(stderr, "%s\n", mysql_error(conn));
+            continue;
+        }
+
+
+
+        // Check whether this query will return nothing
+        if (mysql_field_count(conn) == 0) {
+            // Query does not return data (e.g., INSERT, UPDATE, DELETE)
+            int affected_rows = mysql_affected_rows(conn);
+            printf("Query OK, %d rows affected\n", affected_rows);
+        } else {
+            // Query returns data (e.g., SELECT)
+            res = mysql_store_result(conn);
+            if (res == NULL) {
+                fprintf(stderr, "%s\n", mysql_error(conn));
+                continue;
+            }
+
+            /* Check whether the query is empty set*/
+            if (mysql_num_rows(res) == 0) {
+                printf("The query returned an empty set. Please try again to log in\n");
+                continue;
+            } 
+
+            // Get the number of fields in the result
+            int num_fields = mysql_num_fields(res);
+
+            // print the res
+            while ((row = mysql_fetch_row(res)) != NULL) {
+                for (int i = 0; i < num_fields; i++) {
+                    if(i==0){
+                        printf("\nHello, welcome user %s\n\n\t",row[0]);
+                    }
+                    printf("%s ", row[i] ? row[i] : "NULL");
+                }
+                printf("\n\t");
+            }
+        }
+
+#endif
 
     }
 
