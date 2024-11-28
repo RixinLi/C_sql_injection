@@ -4,6 +4,8 @@ LIBS = -L/usr/lib/x86_64-linux-gnu -lmysqlclient -lpthread -ldl -lssl -lcrypto -
 
 TARGET =  sqlinjection
 
+PARAMETERIZED: CFLAGS += -DPARAMETERIZED
+PARAMETERIZED: LOGIN
 LOGIN: CFLAGS += -DLOGIN
 LOGIN: sqlinjection.o
 	$(CC) -o $(TARGET) sqlinjection.o $(LIBS) 
@@ -18,4 +20,4 @@ sqlinjection.o: sqlinjection.c
 
 clean:
 	rm -rf *.o
-	rm -rf sqlinjection
+	rm -rf sqlinjection	
