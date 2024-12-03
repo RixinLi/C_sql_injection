@@ -5,9 +5,9 @@
 https://computingforgeeks.com/how-to-install-mysql-on-kali-linux/
 
 # Plugins for C API:
-sudo apt install libmysqlclient-dev
-mysql_config --cflags
-mysql_config --libs
+1. sudo apt install libmysqlclient-dev
+2. mysql_config --cflags
+3. mysql_config --libs
 
 # Linux Mysql implementation reference:
 https://dev.mysql.com/doc/c-api/9.1/en/c-api-building-clients.html
